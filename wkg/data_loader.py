@@ -127,7 +127,7 @@ create table elements (
     elm_scinam                  VARCHAR(64),
     elm_comnam                  VARCHAR(64),
     group_                      VARCHAR(32),
-    fwa_v1                      INTEGER NULL,
+    fwa_v1                      INTEGER,
     tax_list                    VARCHAR(32),
     g_rank                      VARCHAR(16),
     s_rank                      VARCHAR(32),
@@ -143,19 +143,19 @@ create table elements (
     genus                       VARCHAR(32),
     species                     VARCHAR(32),
     subsp_var                   VARCHAR(32),
-    kingdom_id                  VARCHAR(32),
-    phylum_id                   VARCHAR(32),
-    tax_class_i                 VARCHAR(32),
-    tax_order_i                 VARCHAR(32),
-    family_id                   INTEGER NULL,
-    genus_id                    INTEGER NULL,
-    species_id                  INTEGER NULL,
-    elm_id                      INTEGER NULL,
-    other_id                    INTEGER NULL,
+    kingdom_id                  INTEGER,
+    phylum_id                   INTEGER,
+    tax_class_i                 INTEGER,
+    tax_order_i                 INTEGER,
+    family_id                   INTEGER,
+    genus_id                    INTEGER,
+    species_id                  INTEGER,
+    elm_id                      INTEGER,
+    other_id                    INTEGER,
     sensitive_fam               VARCHAR(32),
-    ns_endemic                  INTEGER NULL,
-    safit_endemic               INTEGER NULL,
-    other_endemic               INTEGER NULL,
+    ns_endemic                  INTEGER,
+    safit_endemic               INTEGER,
+    other_endemic               INTEGER,
     endemism_comment            TEXT,
     fed_list                    VARCHAR(64),
     state_list                  VARCHAR(64),
@@ -217,7 +217,7 @@ f = rename(f, {
     'Extinct':                'extinct',
 })
 f = convert(f, ('fwa_v1'), lambda v: int(v))
-f = convert(f, ('family_id', 'genus_id', 'species_id', 'elm_id', 'other_id'), lambda v: int(float(v)))
+f = convert(f, ('kingdom_id', 'phylum_id', 'tax_class_i', 'tax_order_i', 'family_id', 'genus_id', 'species_id', 'elm_id', 'other_id'), lambda v: int(float(v)))
 todb(f, connection, 'elements')
 
 # AU_v_elm: create, map, and load
@@ -236,7 +236,7 @@ create table au_v_elm (
     elm_id                      INTEGER,
     elm_type_id                 INTEGER,
     quality                     VARCHAR(16),
-    amount                      INTEGER
+    amount                      DOUBLE PRECISION
 );
 """)
 f = fromcsv('Preview_Database_V2_0_5/AU_v_elm.csv')
@@ -253,7 +253,7 @@ f = rename(f, {
     'Quality':                  'quality',
     'Amount':                   'amount',
 })
-f = convert(f, ('amount'), lambda v: int(float(v)))
+f = convert(f, ('amount'), lambda v: float(v))
 todb(f, connection, 'au_v_elm')
 
 
