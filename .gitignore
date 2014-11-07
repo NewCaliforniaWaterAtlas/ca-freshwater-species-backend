@@ -1,6 +1,9 @@
 # JetBrains IDE
 .idea/
 
+# Twelve Factor
+.env
+
 # GitHub boilerplate below
 #
 # Byte-compiled / optimized / DLL files
