@@ -55,12 +55,10 @@ ROOT_URLCONF = 'ca_freshwater_species_backend.urls'
 
 WSGI_APPLICATION = 'ca_freshwater_species_backend.wsgi.application'
 
-TASTYPIE_SWAGGER_API_MODULE = 'ca_freshwater_species_backend.urls.v1_api'
-
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
 
-POSTGIS_VERSION = ( 2, 1 )
+POSTGIS_VERSION = (2, 1, 0)
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
@@ -84,8 +82,19 @@ USE_L10N = True
 
 USE_TZ = True
 
+TASTYPIE_SWAGGER_API_MODULE = 'ca_freshwater_species_backend.urls.v1_api'
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 
+# Static asset configuration
+import os
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+STATIC_ROOT = 'staticfiles'
 STATIC_URL = '/static/'
+
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'static'),
+)
+
