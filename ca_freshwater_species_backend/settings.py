@@ -36,6 +36,9 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.gis',
+    'tastypie',
+    'tastypie_swagger',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -52,14 +55,19 @@ ROOT_URLCONF = 'ca_freshwater_species_backend.urls'
 
 WSGI_APPLICATION = 'ca_freshwater_species_backend.wsgi.application'
 
+TASTYPIE_SWAGGER_API_MODULE = 'ca_freshwater_species_backend.urls.v1_api'
 
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
 
+POSTGIS_VERSION = ( 2, 1 )
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        'HOST': '',
+        'NAME': 'ca_freshwater_species',
+        'USER': os.environ['DB_USER'],
+        'PASSWORD': os.environ['DB_PASSWORD'],
     }
 }
 
