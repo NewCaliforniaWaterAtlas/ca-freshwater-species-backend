@@ -9,6 +9,11 @@ admin.autodiscover()
 
 v1_api = Api(api_name='v1')
 v1_api.register(SourceResource())
+v1_api.register(OriginResource())
+v1_api.register(ObservationTypeResource())
+v1_api.register(HabitatUsageResource())
+v1_api.register(ElementsResource())
+v1_api.register(AuVElmResource())
 
 urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
