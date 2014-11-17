@@ -14,7 +14,7 @@ from collections import OrderedDict
 # Set up the database connection
 #
 connection = psycopg2.connect(
-    database=os.environ['DB_USER'],
+    database=os.environ['DB'],
     user=os.environ['DB_USER'],
     password=os.environ['DB_PASSWORD'],
     host=os.environ['DB_HOST'],
