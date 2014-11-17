@@ -1,12 +1,24 @@
 #!/usr/bin/env python
 
+#
+# Run this from the top level as
+#
+#    honcho run python wkg/data_loader.py
+#
+
+import os
 import psycopg2
 from petl import *
 from collections import OrderedDict
 
 # Set up the database connection
 #
-connection = psycopg2.connect("dbname=ca_freshwater_species user=erictheise")
+connection = psycopg2.connect(
+    database=os.environ['DB_USER'],
+    user=os.environ['DB_USER'],
+    password=os.environ['DB_PASSWORD'],
+    host=os.environ['DB_HOST'],
+)
 cursor = connection.cursor()
 
 # Origin: create, map, and load
@@ -20,7 +32,7 @@ create table origin (
     org_name                    VARCHAR(32)
 );
 """)
-f = fromcsv('Preview_Database_V2_0_5/Origin.csv')
+f = fromcsv('./wkg/Preview_Database_V2_0_5/Origin.csv')
 f = rename(f, {
     'OBJECTID':                 'object_id',
     'Org_ID':                   'org_id',
@@ -41,7 +53,7 @@ create table observation_type (
     current_other               VARCHAR(32)
 );
 """)
-f = fromcsv('Preview_Database_V2_0_5/ObservationType.csv')
+f = fromcsv('./wkg/Preview_Database_V2_0_5/ObservationType.csv')
 f = rename(f, {
     'OBJECTID':                 'object_id',
     'ObsTyp_ID':                'obs_typ_id',
@@ -76,7 +88,7 @@ create table source (
     count_elm_ids               INTEGER
 );
 """)
-f = fromcsv('Preview_Database_V2_0_5/Source.csv')
+f = fromcsv('./wkg/Preview_Database_V2_0_5/Source.csv')
 f = rename(f, {
     'OBJECTID':                  'object_id',
     'Source_ID':                 'source_id',
@@ -109,7 +121,7 @@ create table habitat_usage (
     hab_usage_name              VARCHAR(32)
 );
 """)
-f = fromcsv('Preview_Database_V2_0_5/HabitatUsage.csv')
+f = fromcsv('./wkg/Preview_Database_V2_0_5/HabitatUsage.csv')
 f = rename(f, {
     'OBJECTID':                 'object_id',
     'HabU_ID':                  'hab_usage_id',
@@ -169,7 +181,7 @@ create table elements (
     extinct                     BOOLEAN
 );
 """)
-f = fromcsv('Preview_Database_V2_0_5/Elements.csv')
+f = fromcsv('./wkg/Preview_Database_V2_0_5/Elements.csv')
 f = rename(f, {
     'OBJECTID':               'object_id',
     'ELM_SCINAM':             'elm_scinam',
@@ -239,7 +251,7 @@ create table au_v_elm (
     amount                      DOUBLE PRECISION
 );
 """)
-f = fromcsv('Preview_Database_V2_0_5/AU_v_elm.csv')
+f = fromcsv('./wkg/Preview_Database_V2_0_5/AU_v_elm.csv')
 f = rename(f, {
     'OBJECTID':                 'object_id',
     'HUC_12':                   'huc_12',
