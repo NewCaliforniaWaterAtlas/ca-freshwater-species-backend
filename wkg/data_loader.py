@@ -3,13 +3,23 @@
 #
 # Run this from the top level as
 #
-#    honcho run python wkg/data_loader.py
+#    honcho run python wkg/data_loader.py 'subdirectory'
 #
 
 import os
 import psycopg2
 from petl import *
+import argparse
 from collections import OrderedDict
+
+# get the subdirectory containing the .csv files from the command line and check that it exists.
+#
+parser = argparse.ArgumentParser(description='Import .csv files for the Freshwater Species Database.')
+parser.add_argument('subdir', help="name of the database subdirectory (expected to be in 'wkg/')")
+args = parser.parse_args()
+if not os.path.exists(os.path.join('wkg', args.subdir)):
+    print('Error: ' + args.subdir + " does not exist as a subdirectory of 'wkg/'.")
+    exit()
 
 # Set up the database connection
 #
@@ -32,7 +42,7 @@ create table origin (
     org_name                    VARCHAR(32)
 );
 """)
-f = fromcsv('./wkg/Preview_Database_V2_0_5/Origin.csv')
+f = fromcsv(os.path.join('wkg', args.subdir, 'Origin.csv'))
 f = rename(f, {
     'OBJECTID':                 'object_id',
     'Org_ID':                   'org_id',
@@ -53,7 +63,7 @@ create table observation_type (
     current_other               VARCHAR(32)
 );
 """)
-f = fromcsv('./wkg/Preview_Database_V2_0_5/ObservationType.csv')
+f = fromcsv(os.path.join('wkg', args.subdir, 'ObservationType.csv'))
 f = rename(f, {
     'OBJECTID':                 'object_id',
     'ObsTyp_ID':                'obs_typ_id',
@@ -88,7 +98,7 @@ create table source (
     count_elm_ids               INTEGER
 );
 """)
-f = fromcsv('./wkg/Preview_Database_V2_0_5/Source.csv')
+f = fromcsv(os.path.join('wkg', args.subdir, 'Source.csv'))
 f = rename(f, {
     'OBJECTID':                  'object_id',
     'Source_ID':                 'source_id',
@@ -121,7 +131,7 @@ create table habitat_usage (
     hab_usage_name              VARCHAR(32)
 );
 """)
-f = fromcsv('./wkg/Preview_Database_V2_0_5/HabitatUsage.csv')
+f = fromcsv(os.path.join('wkg', args.subdir, 'HabitatUsage.csv'))
 f = rename(f, {
     'OBJECTID':                 'object_id',
     'HabU_ID':                  'hab_usage_id',
@@ -181,7 +191,7 @@ create table elements (
     extinct                     BOOLEAN
 );
 """)
-f = fromcsv('./wkg/Preview_Database_V2_0_5/Elements.csv')
+f = fromcsv(os.path.join('wkg', args.subdir, 'Elements.csv'))
 f = rename(f, {
     'OBJECTID':               'object_id',
     'ELM_SCINAM':             'elm_scinam',
@@ -251,7 +261,7 @@ create table au_v_elm (
     amount                      DOUBLE PRECISION
 );
 """)
-f = fromcsv('./wkg/Preview_Database_V2_0_5/AU_v_elm.csv')
+f = fromcsv(os.path.join('wkg', args.subdir, 'AU_v_elm.csv'))
 f = rename(f, {
     'OBJECTID':                 'object_id',
     'HUC_12':                   'huc_12',
