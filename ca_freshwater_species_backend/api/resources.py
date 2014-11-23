@@ -26,9 +26,9 @@ class HabitatUsageResource(ModelResource):
         allowed_methods = ['get']
 
 
-class ElementsResource(ModelResource):
+class ElementResource(ModelResource):
     class Meta:
-        queryset = Elements.objects.all()
+        queryset = Element.objects.all()
         allowed_methods = ['get']
 
 

@@ -12,7 +12,7 @@ v1_api.register(SourceResource())
 v1_api.register(OriginResource())
 v1_api.register(ObservationTypeResource())
 v1_api.register(HabitatUsageResource())
-v1_api.register(ElementsResource())
+v1_api.register(ElementResource())
 v1_api.register(AuVElmResource())
 
 urlpatterns = patterns('',

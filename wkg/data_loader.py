@@ -10,7 +10,6 @@ import os
 import psycopg2
 from petl import *
 import argparse
-from collections import OrderedDict
 
 # get the subdirectory containing the .csv files from the command line and check that it exists.
 #
@@ -34,8 +33,8 @@ cursor = connection.cursor()
 # Origin: create, map, and load
 #
 cursor.execute("""
-DROP TABLE IF EXISTS origin;
-create table origin (
+DROP TABLE IF EXISTS origins;
+create table origins (
     id                          BIGSERIAL NOT NULL UNIQUE PRIMARY KEY,
     object_id                   INTEGER,
     org_id                      INTEGER,
@@ -48,19 +47,21 @@ f = rename(f, {
     'Org_ID':                   'org_id',
     'Org_Name':                 'org_name',
 })
-todb(f, connection, 'origin')
+f = convertnumbers(f)
+todb(f, connection, 'origins')
 
 # ObservationType: create, map, and load
 #
 cursor.execute("""
-DROP TABLE IF EXISTS observation_type;
-create table observation_type (
+DROP TABLE IF EXISTS observation_types;
+create table observation_types (
     id                          BIGSERIAL NOT NULL UNIQUE PRIMARY KEY,
     object_id                   INTEGER,
     obs_typ_id                  INTEGER,
     obs_typ_name                VARCHAR(64),
     range_obs                   VARCHAR(32),
-    current_other               VARCHAR(32)
+    current_other               VARCHAR(32),
+    group_                      VARCHAR(32)
 );
 """)
 f = fromcsv(os.path.join('wkg', args.subdir, 'ObservationType.csv'))
@@ -70,14 +71,16 @@ f = rename(f, {
     'ObsTyp_Name':              'obs_typ_name',
     'Range_Obs':                'range_obs',
     'Current_Other':            'current_other',
+    'Group_':                   'group_',
 })
-todb(f, connection, 'observation_type')
+f = convertnumbers(f)
+todb(f, connection, 'observation_types')
 
 # Source: create, map, and load
 #
 cursor.execute("""
-DROP TABLE IF EXISTS source;
-create table source (
+DROP TABLE IF EXISTS sources;
+create table sources (
     id                          BIGSERIAL NOT NULL UNIQUE PRIMARY KEY,
     object_id                   INTEGER,
     source_id                   INTEGER,
@@ -118,13 +121,21 @@ f = rename(f, {
     'Count_HUC12s':              'count_huc12s',
     'Count_Elm_IDs':             'count_elm_ids'
 })
-todb(f, connection, 'source')
+f = convertnumbers(f)
+f = convert(f, (
+    'object_id',
+    'source_id',
+    'comment_id',
+    'count_huc12s',
+    'count_elm_ids',
+), lambda v: int(v))
+todb(f, connection, 'sources')
 
 # HabitatUsage: create, map, and load
 #
 cursor.execute("""
-DROP TABLE IF EXISTS habitat_usage;
-create table habitat_usage (
+DROP TABLE IF EXISTS habitat_usages;
+create table habitat_usages (
     id                          BIGSERIAL NOT NULL UNIQUE PRIMARY KEY,
     object_id                   INTEGER,
     hab_usage_id                INTEGER,
@@ -137,7 +148,8 @@ f = rename(f, {
     'HabU_ID':                  'hab_usage_id',
     'HabU_Name':                'hab_usage_name',
 })
-todb(f, connection, 'habitat_usage')
+f = convertnumbers(f)
+todb(f, connection, 'habitat_usages')
 
 # Element: create, map, and load
 #
@@ -188,7 +200,8 @@ create table elements (
     endemic                     BOOLEAN,
     common                      BOOLEAN,
     not_evaluated               BOOLEAN,
-    extinct                     BOOLEAN
+    extinct                     BOOLEAN,
+    status                      VARCHAR(32)
 );
 """)
 f = fromcsv(os.path.join('wkg', args.subdir, 'Elements.csv'))
@@ -222,7 +235,7 @@ f = rename(f, {
     'Species_ID':             'species_id',
     'ELM_ID':                 'elm_id',
     'Other_ID':               'other_id',
-    'Senitive_Fam':           'sensitive_fam',
+    'Sensitive_Fam':          'sensitive_fam',
     'NS_endemic':             'ns_endemic',
     'SAFIT_endemic':          'safit_endemic',
     'Other_endemic':          'other_endemic',
@@ -237,47 +250,63 @@ f = rename(f, {
     'Common':                 'common',
     'Not_evaluated':          'not_evaluated',
     'Extinct':                'extinct',
+    'Status':                 'status',
 })
-f = convert(f, ('fwa_v1'), lambda v: int(v))
-f = convert(f, ('kingdom_id', 'phylum_id', 'tax_class_i', 'tax_order_i', 'family_id', 'genus_id', 'species_id', 'elm_id', 'other_id'), lambda v: int(float(v)))
+f = convert(f, (
+    'object_id',
+    'fwa_v1',
+    'kingdom_id',
+    'phylum_id',
+    'tax_class_i',
+    'tax_order_i',
+    'family_id',
+    'genus_id',
+    'species_id',
+    'elm_id',
+    'other_id',
+), lambda v: int(v))
+#f = convert(f, (
+#    'kingdom_id',
+#    'phylum_id',
+#    'tax_class_i',
+#    'tax_order_i',
+#    'family_id',
+#    'genus_id',
+#    'species_id',
+#    'elm_id',
+#    'other_id',
+#), lambda v: int(float(v)))
 todb(f, connection, 'elements')
 
 # AU_v_elm: create, map, and load
 #
 cursor.execute("""
-DROP TABLE IF EXISTS au_v_elm;
-create table au_v_elm (
+DROP TABLE IF EXISTS au_v_elms;
+create table au_v_elms (
     id                          BIGSERIAL NOT NULL UNIQUE PRIMARY KEY,
     object_id                   INTEGER,
-    huc_12                      VARCHAR(12),
-    hab_usage_id                INTEGER,
-    obs_typ_id                  INTEGER,
-    fmt_id                      INTEGER,
-    org_id                      INTEGER,
-    source_id                   INTEGER,
     elm_id                      INTEGER,
-    elm_type_id                 INTEGER,
-    quality                     VARCHAR(16),
-    amount                      DOUBLE PRECISION
+    huc_12                      VARCHAR(12),
+    obs_typ_id                  INTEGER,
+    source_id                   INTEGER,
+    frequency                   DOUBLE PRECISION,
+    sum_amount                  DOUBLE PRECISION
 );
 """)
-f = fromcsv(os.path.join('wkg', args.subdir, 'AU_v_elm.csv'))
+f = fromcsv(os.path.join('wkg', args.subdir, 'AU_v_Elm_sum.csv'))
 f = rename(f, {
-    'OBJECTID':                 'object_id',
-    'HUC_12':                   'huc_12',
-    'HabU_ID':                  'hab_usage_id',
-    'ObsTyp_ID':                'obs_typ_id',
-    'Fmt_ID':                   'fmt_id',
-    'Org_ID':                   'org_id',
-    'Source_ID':                'source_id',
+    'OID_':                     'object_id',
     'Elm_ID':                   'elm_id',
-    'ElmType_ID':               'elm_type_id',
-    'Quality':                  'quality',
-    'Amount':                   'amount',
+    'HUC_12':                   'huc_12',
+    'ObsTyp_ID':                'obs_typ_id',
+    'Source_ID':                'source_id',
+    'FREQUENCY':                'frequency',
+    'SUM_Amount':               'sum_amount',
 })
-f = convert(f, ('amount'), lambda v: float(v))
-todb(f, connection, 'au_v_elm')
-
+f = convertnumbers(f)
+f = convert(f, ('object_id', lambda v: int(float(v))))
+f = convert(f, ('sum_amount'), lambda v: float(v))
+todb(f, connection, 'au_v_elms')
 
 # cursor.execute("""
 # UPDATE STATION SET location = ST_GeomFromText('POINT(' || -lng || ' ' || lat || ' ' || ')', 4326);

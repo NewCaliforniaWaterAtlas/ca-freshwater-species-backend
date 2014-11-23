@@ -15,23 +15,19 @@ from django.contrib.gis.db import models
 class AuVElm(models.Model):
     id = models.BigIntegerField(primary_key=True)
     object_id = models.IntegerField(blank=True, null=True)
-    huc_12 = models.CharField(max_length=12, blank=True)
-    hab_usage_id = models.IntegerField(blank=True, null=True)
-    obs_typ_id = models.IntegerField(blank=True, null=True)
-    fmt_id = models.IntegerField(blank=True, null=True)
-    org_id = models.IntegerField(blank=True, null=True)
-    source_id = models.IntegerField(blank=True, null=True)
     elm_id = models.IntegerField(blank=True, null=True)
-    elm_type_id = models.IntegerField(blank=True, null=True)
-    quality = models.CharField(max_length=16, blank=True)
-    amount = models.FloatField(blank=True, null=True)
+    huc_12 = models.CharField(max_length=12, blank=True)
+    obs_typ_id = models.IntegerField(blank=True, null=True)
+    source_id = models.IntegerField(blank=True, null=True)
+    frequency = models.FloatField(blank=True, null=True)
+    sum_amount = models.FloatField(blank=True, null=True)
 
     class Meta:
         managed = False
-        db_table = 'au_v_elm'
+        db_table = 'au_v_elms'
 
 
-class Elements(models.Model):
+class Element(models.Model):
     id = models.BigIntegerField(primary_key=True)
     object_id = models.IntegerField(blank=True, null=True)
     elm_scinam = models.CharField(max_length=64, blank=True)
@@ -91,7 +87,7 @@ class HabitatUsage(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'habitat_usage'
+        db_table = 'habitat_usages'
 
 
 class ObservationType(models.Model):
@@ -104,7 +100,7 @@ class ObservationType(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'observation_type'
+        db_table = 'observation_types'
 
 
 class Origin(models.Model):
@@ -115,7 +111,7 @@ class Origin(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'origin'
+        db_table = 'origins'
 
 
 class Source(models.Model):
@@ -140,4 +136,4 @@ class Source(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'source'
+        db_table = 'sources'
