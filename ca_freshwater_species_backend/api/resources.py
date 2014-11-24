@@ -1,3 +1,4 @@
+from tastypie import fields
 from tastypie.resources import ModelResource
 from ca_freshwater_species_backend.models import *
 
@@ -29,10 +30,13 @@ class HabitatUsageResource(ModelResource):
 class ElementResource(ModelResource):
     class Meta:
         queryset = Element.objects.all()
+        resource_name = 'element'
         allowed_methods = ['get']
 
 
 class AuVElmResource(ModelResource):
+    element = fields.ToOneField(ElementResource, 'element')
+
     class Meta:
         queryset = AuVElm.objects.all()
         allowed_methods = ['get']

@@ -36,7 +36,7 @@ cursor.execute("""
 DROP TABLE IF EXISTS origins;
 create table origins (
     id                          BIGSERIAL NOT NULL UNIQUE PRIMARY KEY,
-    object_id                   INTEGER,
+    object_id                   INTEGER UNIQUE,
     org_id                      INTEGER,
     org_name                    VARCHAR(32)
 );
@@ -56,7 +56,7 @@ cursor.execute("""
 DROP TABLE IF EXISTS observation_types;
 create table observation_types (
     id                          BIGSERIAL NOT NULL UNIQUE PRIMARY KEY,
-    object_id                   INTEGER,
+    object_id                   INTEGER UNIQUE,
     obs_typ_id                  INTEGER,
     obs_typ_name                VARCHAR(64),
     range_obs                   VARCHAR(32),
@@ -82,7 +82,7 @@ cursor.execute("""
 DROP TABLE IF EXISTS sources;
 create table sources (
     id                          BIGSERIAL NOT NULL UNIQUE PRIMARY KEY,
-    object_id                   INTEGER,
+    object_id                   INTEGER UNIQUE,
     source_id                   INTEGER,
     source_name                 VARCHAR(256),
     sourcegrp_name              VARCHAR(64),
@@ -137,7 +137,7 @@ cursor.execute("""
 DROP TABLE IF EXISTS habitat_usages;
 create table habitat_usages (
     id                          BIGSERIAL NOT NULL UNIQUE PRIMARY KEY,
-    object_id                   INTEGER,
+    object_id                   INTEGER UNIQUE,
     hab_usage_id                INTEGER,
     hab_usage_name              VARCHAR(32)
 );
@@ -157,7 +157,7 @@ cursor.execute("""
 DROP TABLE IF EXISTS elements;
 create table elements (
     id                          BIGSERIAL NOT NULL UNIQUE PRIMARY KEY,
-    object_id                   INTEGER,
+    object_id                   INTEGER UNIQUE,
     elm_scinam                  VARCHAR(64),
     elm_comnam                  VARCHAR(64),
     group_                      VARCHAR(32),
@@ -284,8 +284,8 @@ cursor.execute("""
 DROP TABLE IF EXISTS au_v_elms;
 create table au_v_elms (
     id                          BIGSERIAL NOT NULL UNIQUE PRIMARY KEY,
-    object_id                   INTEGER,
-    elm_id                      INTEGER,
+    object_id                   INTEGER UNIQUE,
+    elm_id                      INTEGER REFERENCES elements (object_id),
     huc_12                      VARCHAR(12),
     obs_typ_id                  INTEGER,
     source_id                   INTEGER,

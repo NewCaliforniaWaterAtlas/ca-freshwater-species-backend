@@ -12,19 +12,64 @@ from __future__ import unicode_literals
 from django.contrib.gis.db import models
 
 
-class AuVElm(models.Model):
+class Origin(models.Model):
     id = models.BigIntegerField(primary_key=True)
     object_id = models.IntegerField(blank=True, null=True)
-    elm_id = models.IntegerField(blank=True, null=True)
-    huc_12 = models.CharField(max_length=12, blank=True)
-    obs_typ_id = models.IntegerField(blank=True, null=True)
-    source_id = models.IntegerField(blank=True, null=True)
-    frequency = models.FloatField(blank=True, null=True)
-    sum_amount = models.FloatField(blank=True, null=True)
+    org_id = models.IntegerField(blank=True, null=True)
+    org_name = models.CharField(max_length=32, blank=True)
 
     class Meta:
         managed = False
-        db_table = 'au_v_elms'
+        db_table = 'origins'
+
+
+class ObservationType(models.Model):
+    id = models.BigIntegerField(primary_key=True)
+    object_id = models.IntegerField(blank=True, null=True)
+    obs_typ_id = models.IntegerField(blank=True, null=True)
+    obs_typ_name = models.CharField(max_length=64, blank=True)
+    range_obs = models.CharField(max_length=32, blank=True)
+    current_other = models.CharField(max_length=32, blank=True)
+
+    class Meta:
+        managed = False
+        db_table = 'observation_types'
+
+
+class Source(models.Model):
+    id = models.BigIntegerField(primary_key=True)
+    object_id = models.IntegerField(blank=True, null=True)
+    source_id = models.IntegerField(blank=True, null=True)
+    source_name = models.CharField(max_length=256, blank=True)
+    sourcegrp_name = models.CharField(max_length=64, blank=True)
+    use_agree = models.TextField(blank=True)
+    permission_request_needed = models.CharField(max_length=64, blank=True)
+    permission_contact_name = models.CharField(max_length=32, blank=True)
+    permission_contact_email = models.CharField(max_length=64, blank=True)
+    permission_status = models.TextField(blank=True)
+    permission = models.CharField(max_length=32, blank=True)
+    comment_id = models.IntegerField(blank=True, null=True)
+    citation = models.TextField(blank=True)
+    weblink = models.CharField(max_length=128, blank=True)
+    pre_release_review = models.CharField(max_length=8, blank=True)
+    aggregator = models.CharField(max_length=32, blank=True)
+    count_huc12s = models.IntegerField(blank=True, null=True)
+    count_elm_ids = models.IntegerField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'sources'
+
+
+class HabitatUsage(models.Model):
+    id = models.BigIntegerField(primary_key=True)
+    object_id = models.IntegerField(blank=True, null=True)
+    hab_usage_id = models.IntegerField(blank=True, null=True)
+    hab_usage_name = models.CharField(max_length=32, blank=True)
+
+    class Meta:
+        managed = False
+        db_table = 'habitat_usages'
 
 
 class Element(models.Model):
@@ -79,61 +124,18 @@ class Element(models.Model):
         db_table = 'elements'
 
 
-class HabitatUsage(models.Model):
+class AuVElm(models.Model):
     id = models.BigIntegerField(primary_key=True)
     object_id = models.IntegerField(blank=True, null=True)
-    hab_usage_id = models.IntegerField(blank=True, null=True)
-    hab_usage_name = models.CharField(max_length=32, blank=True)
-
-    class Meta:
-        managed = False
-        db_table = 'habitat_usages'
-
-
-class ObservationType(models.Model):
-    id = models.BigIntegerField(primary_key=True)
-    object_id = models.IntegerField(blank=True, null=True)
+    element = models.ForeignKey(Element, to_field='object_id', db_column='elm_id')
+    huc_12 = models.CharField(max_length=12, blank=True)
     obs_typ_id = models.IntegerField(blank=True, null=True)
-    obs_typ_name = models.CharField(max_length=64, blank=True)
-    range_obs = models.CharField(max_length=32, blank=True)
-    current_other = models.CharField(max_length=32, blank=True)
-
-    class Meta:
-        managed = False
-        db_table = 'observation_types'
-
-
-class Origin(models.Model):
-    id = models.BigIntegerField(primary_key=True)
-    object_id = models.IntegerField(blank=True, null=True)
-    org_id = models.IntegerField(blank=True, null=True)
-    org_name = models.CharField(max_length=32, blank=True)
-
-    class Meta:
-        managed = False
-        db_table = 'origins'
-
-
-class Source(models.Model):
-    id = models.BigIntegerField(primary_key=True)
-    object_id = models.IntegerField(blank=True, null=True)
     source_id = models.IntegerField(blank=True, null=True)
-    source_name = models.CharField(max_length=256, blank=True)
-    sourcegrp_name = models.CharField(max_length=64, blank=True)
-    use_agree = models.TextField(blank=True)
-    permission_request_needed = models.CharField(max_length=64, blank=True)
-    permission_contact_name = models.CharField(max_length=32, blank=True)
-    permission_contact_email = models.CharField(max_length=64, blank=True)
-    permission_status = models.TextField(blank=True)
-    permission = models.CharField(max_length=32, blank=True)
-    comment_id = models.IntegerField(blank=True, null=True)
-    citation = models.TextField(blank=True)
-    weblink = models.CharField(max_length=128, blank=True)
-    pre_release_review = models.CharField(max_length=8, blank=True)
-    aggregator = models.CharField(max_length=32, blank=True)
-    count_huc12s = models.IntegerField(blank=True, null=True)
-    count_elm_ids = models.IntegerField(blank=True, null=True)
+    frequency = models.FloatField(blank=True, null=True)
+    sum_amount = models.FloatField(blank=True, null=True)
 
     class Meta:
         managed = False
-        db_table = 'sources'
+        db_table = 'au_v_elms'
+
+
