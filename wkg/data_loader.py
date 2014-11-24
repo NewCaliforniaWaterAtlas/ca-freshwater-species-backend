@@ -33,7 +33,7 @@ cursor = connection.cursor()
 # Origin: create, map, and load
 #
 cursor.execute("""
-DROP TABLE IF EXISTS origins;
+DROP TABLE IF EXISTS origins CASCADE;
 create table origins (
     id                          BIGSERIAL NOT NULL UNIQUE PRIMARY KEY,
     object_id                   INTEGER UNIQUE,
@@ -53,7 +53,7 @@ todb(f, connection, 'origins')
 # ObservationType: create, map, and load
 #
 cursor.execute("""
-DROP TABLE IF EXISTS observation_types;
+DROP TABLE IF EXISTS observation_types CASCADE;
 create table observation_types (
     id                          BIGSERIAL NOT NULL UNIQUE PRIMARY KEY,
     object_id                   INTEGER UNIQUE,
@@ -79,7 +79,7 @@ todb(f, connection, 'observation_types')
 # Source: create, map, and load
 #
 cursor.execute("""
-DROP TABLE IF EXISTS sources;
+DROP TABLE IF EXISTS sources CASCADE;
 create table sources (
     id                          BIGSERIAL NOT NULL UNIQUE PRIMARY KEY,
     object_id                   INTEGER UNIQUE,
@@ -134,7 +134,7 @@ todb(f, connection, 'sources')
 # HabitatUsage: create, map, and load
 #
 cursor.execute("""
-DROP TABLE IF EXISTS habitat_usages;
+DROP TABLE IF EXISTS habitat_usages CASCADE;
 create table habitat_usages (
     id                          BIGSERIAL NOT NULL UNIQUE PRIMARY KEY,
     object_id                   INTEGER UNIQUE,
@@ -154,7 +154,7 @@ todb(f, connection, 'habitat_usages')
 # Element: create, map, and load
 #
 cursor.execute("""
-DROP TABLE IF EXISTS elements;
+DROP TABLE IF EXISTS elements CASCADE;
 create table elements (
     id                          BIGSERIAL NOT NULL UNIQUE PRIMARY KEY,
     object_id                   INTEGER UNIQUE,
@@ -177,15 +177,15 @@ create table elements (
     genus                       VARCHAR(32),
     species                     VARCHAR(32),
     subsp_var                   VARCHAR(32),
-    kingdom_id                  INTEGER,
-    phylum_id                   INTEGER,
-    tax_class_i                 INTEGER,
-    tax_order_i                 INTEGER,
-    family_id                   INTEGER,
-    genus_id                    INTEGER,
-    species_id                  INTEGER,
-    elm_id                      INTEGER,
-    other_id                    INTEGER,
+    kingdom_id                  VARCHAR(5),
+    phylum_id                   VARCHAR(5),
+    tax_class_i                 VARCHAR(5),
+    tax_order_i                 VARCHAR(5),
+    family_id                   VARCHAR(5),
+    genus_id                    VARCHAR(5),
+    species_id                  VARCHAR(5),
+    elm_id                      VARCHAR(5),
+    other_id                    VARCHAR(5),
     sensitive_fam               VARCHAR(32),
     ns_endemic                  INTEGER,
     safit_endemic               INTEGER,
@@ -252,7 +252,8 @@ f = rename(f, {
     'Extinct':                'extinct',
     'Status':                 'status',
 })
-f = convert(f, (
+# Attempt to pull the comma-as-thousands separator out.
+f = sub(f, (
     'object_id',
     'fwa_v1',
     'kingdom_id',
@@ -264,24 +265,27 @@ f = convert(f, (
     'species_id',
     'elm_id',
     'other_id',
+), ',', '')
+# Convert the new values to integers; this can handle nulls.
+f = convert(f, (
+    'object_id',
+    'fwa_v1',
 ), lambda v: int(v))
-#f = convert(f, (
-#    'kingdom_id',
-#    'phylum_id',
-#    'tax_class_i',
-#    'tax_order_i',
-#    'family_id',
-#    'genus_id',
-#    'species_id',
-#    'elm_id',
-#    'other_id',
-#), lambda v: int(float(v)))
+# Don't really have to do this, but seems cleaner.
+f = convert(f, (
+    'listed',
+    'vulnerable',
+    'endemic',
+    'common',
+    'not_evaluated',
+    'extinct',
+), { 0: False, 1 : True })
 todb(f, connection, 'elements')
 
 # AU_v_elm: create, map, and load
 #
 cursor.execute("""
-DROP TABLE IF EXISTS au_v_elms;
+DROP TABLE IF EXISTS au_v_elms CASCADE;
 create table au_v_elms (
     id                          BIGSERIAL NOT NULL UNIQUE PRIMARY KEY,
     object_id                   INTEGER UNIQUE,
@@ -307,10 +311,6 @@ f = convertnumbers(f)
 f = convert(f, ('object_id', lambda v: int(float(v))))
 f = convert(f, ('sum_amount'), lambda v: float(v))
 todb(f, connection, 'au_v_elms')
-
-# cursor.execute("""
-# UPDATE STATION SET location = ST_GeomFromText('POINT(' || -lng || ' ' || lat || ' ' || ')', 4326);
-# """)
 
 # Persist and be tidy
 connection.commit()
