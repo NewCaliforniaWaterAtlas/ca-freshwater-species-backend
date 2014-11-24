@@ -57,7 +57,7 @@ DROP TABLE IF EXISTS observation_types CASCADE;
 create table observation_types (
     id                          BIGSERIAL NOT NULL UNIQUE PRIMARY KEY,
     object_id                   INTEGER UNIQUE,
-    obs_typ_id                  INTEGER,
+    obs_typ_id                  INTEGER UNIQUE,
     obs_typ_name                VARCHAR(64),
     range_obs                   VARCHAR(32),
     current_other               VARCHAR(32),
@@ -83,7 +83,7 @@ DROP TABLE IF EXISTS sources CASCADE;
 create table sources (
     id                          BIGSERIAL NOT NULL UNIQUE PRIMARY KEY,
     object_id                   INTEGER UNIQUE,
-    source_id                   INTEGER,
+    source_id                   INTEGER UNIQUE,
     source_name                 VARCHAR(256),
     sourcegrp_name              VARCHAR(64),
     use_agree                   TEXT,
@@ -291,8 +291,8 @@ create table au_v_elms (
     object_id                   INTEGER UNIQUE,
     elm_id                      INTEGER REFERENCES elements (object_id),
     huc_12                      VARCHAR(12),
-    obs_typ_id                  INTEGER,
-    source_id                   INTEGER,
+    obs_typ_id                  INTEGER REFERENCES observation_types (obs_typ_id),
+    source_id                   INTEGER REFERENCES sources (source_id),
     frequency                   DOUBLE PRECISION,
     sum_amount                  DOUBLE PRECISION
 );

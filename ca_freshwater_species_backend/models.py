@@ -26,7 +26,7 @@ class Origin(models.Model):
 class ObservationType(models.Model):
     id = models.BigIntegerField(primary_key=True)
     object_id = models.IntegerField(unique=True, blank=True, null=True)
-    obs_typ_id = models.IntegerField(blank=True, null=True)
+    obs_typ_id = models.IntegerField(unique=True, blank=True, null=True)
     obs_typ_name = models.CharField(max_length=64, blank=True)
     range_obs = models.CharField(max_length=32, blank=True)
     current_other = models.CharField(max_length=32, blank=True)
@@ -39,7 +39,7 @@ class ObservationType(models.Model):
 class Source(models.Model):
     id = models.BigIntegerField(primary_key=True)
     object_id = models.IntegerField(unique=True, blank=True, null=True)
-    source_id = models.IntegerField(blank=True, null=True)
+    source_id = models.IntegerField(unique=True, blank=True, null=True)
     source_name = models.CharField(max_length=256, blank=True)
     sourcegrp_name = models.CharField(max_length=64, blank=True)
     use_agree = models.TextField(blank=True)
@@ -129,8 +129,8 @@ class AuVElm(models.Model):
     object_id = models.IntegerField(unique=True, blank=True, null=True)
     element = models.ForeignKey(Element, to_field='object_id', db_column='elm_id')
     huc_12 = models.CharField(max_length=12, blank=True)
-    obs_typ_id = models.IntegerField(blank=True, null=True)
-    source_id = models.IntegerField(blank=True, null=True)
+    observation_type = models.ForeignKey(ObservationType, to_field='obs_typ_id', db_column='obs_typ_id')
+    source = models.ForeignKey(Source, to_field='source_id', db_column='source_id')
     frequency = models.FloatField(blank=True, null=True)
     sum_amount = models.FloatField(blank=True, null=True)
 
