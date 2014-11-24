@@ -35,8 +35,9 @@ class ElementResource(ModelResource):
 
 
 class AuVElmResource(ModelResource):
-    element = fields.ToOneField(ElementResource, 'element')
+    element = fields.ToOneField(ElementResource, 'element', full=True)
 
     class Meta:
         queryset = AuVElm.objects.all()
         allowed_methods = ['get']
+
