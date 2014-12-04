@@ -14,8 +14,7 @@ from django.contrib.gis.db import models
 
 class Origin(models.Model):
     id = models.BigIntegerField(primary_key=True)
-    object_id = models.IntegerField(unique=True, blank=True, null=True)
-    org_id = models.IntegerField(blank=True, null=True)
+    org_id = models.IntegerField(unique=True, blank=True, null=True)
     org_name = models.CharField(max_length=32, blank=True)
 
     class Meta:
@@ -25,9 +24,8 @@ class Origin(models.Model):
 
 class ObservationType(models.Model):
     id = models.BigIntegerField(primary_key=True)
-    object_id = models.IntegerField(unique=True, blank=True, null=True)
     obs_typ_id = models.IntegerField(unique=True, blank=True, null=True)
-    obs_typ_name = models.CharField(max_length=64, blank=True)
+    obs_typ_name = models.CharField(unique=True, max_length=64)
     range_obs = models.CharField(max_length=32, blank=True)
     current_other = models.CharField(max_length=32, blank=True)
 
@@ -38,9 +36,8 @@ class ObservationType(models.Model):
 
 class Source(models.Model):
     id = models.BigIntegerField(primary_key=True)
-    object_id = models.IntegerField(unique=True, blank=True, null=True)
-    source_id = models.IntegerField(unique=True, blank=True, null=True)
-    source_name = models.CharField(max_length=256, blank=True)
+    source_id = models.IntegerField(db_index=True, unique=True)
+    source_name = models.CharField(unique=True, max_length=256)
     sourcegrp_name = models.CharField(max_length=64, blank=True)
     use_agree = models.TextField(blank=True)
     permission_request_needed = models.CharField(max_length=64, blank=True)
@@ -63,7 +60,6 @@ class Source(models.Model):
 
 class HabitatUsage(models.Model):
     id = models.BigIntegerField(primary_key=True)
-    object_id = models.IntegerField(unique=True, blank=True, null=True)
     hab_usage_id = models.IntegerField(blank=True, null=True)
     hab_usage_name = models.CharField(max_length=32, blank=True)
 
@@ -74,10 +70,9 @@ class HabitatUsage(models.Model):
 
 class Element(models.Model):
     id = models.BigIntegerField(primary_key=True)
-    object_id = models.IntegerField(unique=True, blank=True, null=True)
     elm_scinam = models.CharField(max_length=64, blank=True)
     elm_comnam = models.CharField(max_length=64, blank=True)
-    group_field = models.CharField(db_column='group_', max_length=32, blank=True)  # Field renamed because it ended with '_'.
+    group_field = models.CharField(db_index=True, db_column='group_', max_length=32)  # Field renamed because it ended with '_'.
     fwa_v1 = models.IntegerField(blank=True, null=True)
     tax_list = models.CharField(max_length=32, blank=True)
     g_rank = models.CharField(max_length=16, blank=True)
@@ -101,7 +96,7 @@ class Element(models.Model):
     family_id = models.CharField(max_length=5, blank=True)
     genus_id = models.CharField(max_length=5, blank=True)
     species_id = models.CharField(max_length=5, blank=True)
-    elm_id = models.CharField(max_length=5, blank=True)
+    elm_id = models.IntegerField(db_index=True, unique=True)
     other_id = models.CharField(max_length=5, blank=True)
     sensitive_fam = models.CharField(max_length=32, blank=True)
     ns_endemic = models.IntegerField(blank=True, null=True)
@@ -126,8 +121,7 @@ class Element(models.Model):
 
 class AuVElm(models.Model):
     id = models.BigIntegerField(primary_key=True)
-    object_id = models.IntegerField(unique=True, blank=True, null=True)
-    element = models.ForeignKey(Element, to_field='object_id', db_column='elm_id')
+    element = models.ForeignKey(Element, to_field='elm_id', db_column='elm_id')
     huc_12 = models.CharField(max_length=12, blank=True)
     observation_type = models.ForeignKey(ObservationType, to_field='obs_typ_id', db_column='obs_typ_id')
     source = models.ForeignKey(Source, to_field='source_id', db_column='source_id')
